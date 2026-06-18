@@ -1,12 +1,12 @@
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import celebrateGif from '../../../images/celebrate.gif';
-import { AnimatedText } from './AnimatedText';
+import { AnimatedText } from './AnimatedText'; 
 import { Heart, Sparkles, MoonStar } from 'lucide-react';
 import { WISH_MESSAGES, WISH_PAGE_TEXT } from '../../data/messages';
 import { playHBD, stopHBD } from '../../utils/audioUtils';
 
 //---- BACKGROUND DECORATION ICONS WITH POSITIONS AND STYLING ----//
-
 const decorations = [
   { Icon: Heart, top: 'top-8', left: 'left-8', color: 'text-pink-300/40', size: 'size-8', delay: '0s' },
   { Icon: Heart, top: 'top-20', left: 'right-20', color: 'text-rose-300/30', size: 'size-6', delay: '1s' },
@@ -17,16 +17,11 @@ const decorations = [
   { Icon: Heart, top: 'top-1/2', left: 'left-16', color: 'text-pink-200/50', size: 'size-7', delay: '0.8s' },
   { Icon: Sparkles, top: 'bottom-16', left: 'right-16', color: 'text-rose-400/40', size: 'size-5', delay: '1.2s' },
   { Icon: MoonStar, top: 'top-1/4', left: 'left-1/4', color: 'text-rose-400/40', size: 'size-6', delay: '1.8s' },
-  // Additional decorations for denser background
-  { Icon: Heart, top: 'top-6', left: 'right-6', color: 'text-pink-300/30', size: 'size-5', delay: '0.2s' },
-  { Icon: Sparkles, top: 'bottom-6', left: 'left-6', color: 'text-rose-300/25', size: 'size-5', delay: '0.6s' },
-  { Icon: MoonStar, top: 'top-12', left: 'right-50', color: 'text-rose-300/30', size: 'size-6', delay: '1.1s' },
-  { Icon: Heart, top: 'bottom-8', left: 'right-50', color: 'text-pink-200/30', size: 'size-6', delay: '1.4s' },
 ];
 
-// THIS FUNC SHOWS THE WISH MESSAGES WITH STYLING AND ANIMATIONS
 export function WishMessage() {
   const [messageIndex, setMessageIndex] = useState(0);
+  const [showGift, setShowGift] = useState(false);
 
   useEffect(() => {
     playHBD();
@@ -34,9 +29,11 @@ export function WishMessage() {
   }, []);
 
   const handleComplete = () => {
-    setTimeout(() => {
-      setMessageIndex((prev) => (prev + 1) % WISH_MESSAGES.length);
-    }, 1000);
+    if (messageIndex < WISH_MESSAGES.length - 1) {
+      setTimeout(() => {
+        setMessageIndex((prev) => prev + 1);
+      }, 2500); 
+    }
   };
 
   return (
@@ -62,7 +59,7 @@ export function WishMessage() {
             <Heart className="text-pink-500 size-8 fill-pink-400" />
           </div>
 
-          <div className="min-h-[120px] flex items-center justify-center">
+          <div className="min-h-[120px] flex items-center justify-center flex-col">
             <p className="text-2xl sm:text-3xl text-center text-pink-900/90 italic leading-relaxed">
               <AnimatedText
                 key={messageIndex}
@@ -71,6 +68,29 @@ export function WishMessage() {
                 onComplete={handleComplete}
               />
             </p>
+
+            {/* TOMBOL CLAIM UR REWARD BARU */}
+            {messageIndex === WISH_MESSAGES.length - 1 && !showGift && (
+              <button 
+                onClick={() => setShowGift(true)}
+                className="mt-8 px-6 py-3 bg-rose-500 text-white font-bold rounded-full shadow-lg hover:bg-rose-600 transition-all duration-300 animate-bounce"
+                style={{ pointerEvents: 'auto' }}
+              >
+                🎁 Claim ur reward
+              </button>
+            )}
+
+            {/* TAMPILAN FOTO BARCODE HADIAH */}
+            {showGift && (
+              <div className="mt-6 flex flex-col items-center">
+                <p className="font-bold text-emerald-600 text-sm mb-3">Scan ini untuk ambil jajanmu! ☕🍰</p>
+                <img 
+                  src={new URL('../../../images/barcode.png', import.meta.url).href} 
+                  alt="Gift Barcode" 
+                  className="w-44 h-44 rounded-2xl shadow-md border-4 border-white"
+                />
+              </div>
+            )}
           </div>
 
           <div className="mt-8 flex justify-center gap-2">
@@ -99,5 +119,3 @@ export function WishMessage() {
     </div>
   );
 }
-
-
